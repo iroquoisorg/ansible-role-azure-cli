@@ -1,0 +1,25 @@
+---
+- name: Add Azure repository
+  apt_repository:
+    repo: "deb [arch=amd64] https://packages.microsoft.com/repos/azure-cli/ {{ ansible_distribution_release }} main"
+    state: present
+  register: azure_repository
+
+- name: Add Azure signing key
+  apt_key:
+    url: "https://packages.microsoft.com/keys/microsoft.asc"
+  when: azure_repository.changed
+
+- name: Update packages
+  apt:
+    update_cache: True
+  when: azure_repository.changed
+
+- name: Install apt https transport
+  apt:
+    name: apt-transport-https
+    state: present
+
+- name: Install azure-cli
+  apt:
+    name: azure-cli
